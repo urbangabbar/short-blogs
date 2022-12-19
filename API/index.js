@@ -7,7 +7,6 @@ const { v4: uuidv4 } = require("uuid");
 const User = require("./models/users");
 const bodyParser = require("body-parser");
 
-
 //Created app instance using excpress framework
 const app = express();
 
@@ -20,7 +19,6 @@ const databsePromise = mongoose.connect(mongoURL);
 
 // created json parser for Parsing of body frompost request
 const jsonParser = bodyParser.json();
-
 
 //defined a new post api with url signup
 app.post("/signup", jsonParser, async (req, res) => {
@@ -47,6 +45,25 @@ app.post("/signup", jsonParser, async (req, res) => {
   return res.send({ msg: "User created succesfully", authToken });
 });
 
+app.post("/login", jsonParser, async (req, res) => {
+  // fetching user from datbase using emailId
+  const existingUser = await User.findOne({ email: req.body.email });
+  if (!existingUser) {
+    // if user not found
+    return res
+      .send({ error: "User not found please enter valid details" })
+      .status(400);
+    // we would return an error
+  }
+  if (existingUser.password !== req.body.password) {
+    return res.send({ error: "Invalid password" }).status(400);
+  }
+  // generate new authtoken
+  const authToken = uuidv4();
+  existingUser.authToken.push(authToken);
+  await existingUser.save();
+  return res.send({ msg: "LogIn succesfull", authToken });
+});
 
 // waiting for completion of database connection
 databsePromise
