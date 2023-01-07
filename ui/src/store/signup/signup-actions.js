@@ -1,17 +1,18 @@
 import axios from "axios";
-const SIGNUP = "SIGNUP";
-const SIGNUP_SUCCESS = "SIGNUP_SUCCESS";
-const SIGNUP_FAILED = "SIGNUP_FAILED";
+export const SIGNUP = "SIGNUP";
+export const SIGNUP_SUCCESS = "SIGNUP_SUCCESS";
+export const SIGNUP_FAILED = "SIGNUP_FAILED";
 
+// redux-thunk action creator
 export const startSignup = (data) => {
   return async (dispatch) => {
     dispatch({ type: SIGNUP });
     try {
       const response = await axios.post("/signup", data);
-      dispatch({ type: SIGNUP_SUCCESS, paylod: response });
+      dispatch({ type: SIGNUP_SUCCESS, payload: response.data });
     } catch (error) {
       console.log(error);
-      dispatch({ type: SIGNUP_FAILED, paylod: error });
+      dispatch({ type: SIGNUP_FAILED, payload: error });
     }
   };
 };

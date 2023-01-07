@@ -28,8 +28,8 @@ app.post("/signup", jsonParser, async (req, res) => {
   // if user exists return an error
   if (existingUser) {
     return res
-      .send({ error: "User already exists please login" })
-      .statusCode(400);
+      .status(400)
+      .send({ error: "User already exists please login" });
   }
   // generate new authtoken
   const authToken = uuidv4();

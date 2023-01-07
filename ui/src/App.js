@@ -20,6 +20,9 @@ function App() {
         <Route path="/create-blog/login">
           <div>Login</div>
         </Route>
+        <Route path="/create-blog/dashboard">
+          <div>Dashboard</div>
+        </Route>
       </Switch>
     </BrowserRouter>
   );
