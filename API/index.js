@@ -5,6 +5,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const { v4: uuidv4 } = require("uuid");
 const User = require("./models/users");
+const Blog = require("./models/blog");
 const bodyParser = require("body-parser");
 
 //Created app instance using excpress framework
@@ -64,6 +65,33 @@ app.post("/login", jsonParser, async (req, res) => {
   await existingUser.save();
   return res.send({ msg: "LogIn succesfull", authToken });
 });
+
+
+app.post('/blogs', jsonParser, async (req, res)=> {
+  const {authtoken} = req.headers;
+  const blog = req.body
+
+  const user = await validateAuthToken(authtoken)
+  if(user){
+    const newBlog = new Blog({
+      ...blog,
+      userID: user._id
+    })
+    await newBlog.save()
+    return res.status(200).send(newBlog)
+  }
+  return res.status(401).send({ msg: "Unauthorized user" });  
+});
+
+
+async function validateAuthToken(authtoken){
+  if(!authtoken){
+    return; //undefined value
+  }
+  const user = await User.findOne({ authToken: authtoken });
+
+  return user; // user, null
+}
 
 // waiting for completion of database connection
 databsePromise
