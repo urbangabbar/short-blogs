@@ -28,9 +28,7 @@ app.post("/signup", jsonParser, async (req, res) => {
 
   // if user exists return an error
   if (existingUser) {
-    return res
-      .status(400)
-      .send({ error: "User already exists please login" });
+    return res.status(400).send({ error: "User already exists please login" });
   }
   // generate new authtoken
   const authToken = uuidv4();
@@ -66,26 +64,87 @@ app.post("/login", jsonParser, async (req, res) => {
   return res.send({ msg: "LogIn succesfull", authToken });
 });
 
+app.post("/blogs", jsonParser, async (req, res) => {
+  const { authtoken } = req.headers;
+  const blog = req.body;
 
-app.post('/blogs', jsonParser, async (req, res)=> {
-  const {authtoken} = req.headers;
-  const blog = req.body
-
-  const user = await validateAuthToken(authtoken)
-  if(user){
+  const user = await validateAuthToken(authtoken);
+  if (user) {
     const newBlog = new Blog({
       ...blog,
-      userID: user._id
-    })
-    await newBlog.save()
-    return res.status(200).send(newBlog)
+      userID: user._id,
+    });
+    await newBlog.save();
+    return res.status(200).send(newBlog);
   }
-  return res.status(401).send({ msg: "Unauthorized user" });  
+  return res.status(401).send({ msg: "Unauthorized user" });
 });
 
+app.put("/blogs/:blogID", jsonParser, async (req, res) => {
+  const { authtoken } = req.headers;
+  const { blogID } = req.params;
+  const updatedBlog = req.body;
 
-async function validateAuthToken(authtoken){
-  if(!authtoken){
+  const user = await validateAuthToken(authtoken);
+  if (user) {
+    let blog;
+    try {
+      blog = await Blog.findById(blogID);
+    } catch (error) {
+      return res.status(404).send({ msg: "Invalid blog ID" });
+    }
+    if (blog) {
+      if (blog.userID.toString() === user._id.toString()) {
+        blog.title = updatedBlog.title;
+        blog.content = updatedBlog.content;
+        await blog.save();
+        return res.status(200).send(blog);
+      } else {
+        return res
+          .status(401)
+          .send({ msg: "You are not authorized to perform this operation" });
+      }
+    } else {
+      return res.status(400).send({ msg: "Blog does not exist" });
+    }
+  }
+
+  return res.status(401).send({ msg: "Unauthorized user" });
+});
+
+app.delete("/blogs/:blogID", jsonParser, async (req, res) => {
+  const { authtoken } = req.headers;
+  const { blogID } = req.params;
+
+  const user = await validateAuthToken(authtoken);
+  if (user) {
+    let blog;
+    try {
+      blog = await Blog.findById(blogID);
+    } catch (error) {
+      return res.status(404).send({ msg: "Invalid blog ID" });
+    }
+    if (blog) {
+      if (blog.userID.toString() === user._id.toString()) {
+        await blog.delete();
+        return res
+          .status(200)
+          .send({ msg: "Blog has been delted succesfully" });
+      } else {
+        return res
+          .status(401)
+          .send({ msg: "You are not authorized to perform this operation" });
+      }
+    } else {
+      return res.status(400).send({ msg: "Blog does not exist" });
+    }
+  }
+
+  return res.status(401).send({ msg: "Unauthorized user" });
+});
+
+async function validateAuthToken(authtoken) {
+  if (!authtoken) {
     return; //undefined value
   }
   const user = await User.findOne({ authToken: authtoken });
