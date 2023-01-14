@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import { CreateBlog } from './pages/create-blog';
 import { SignUp } from './pages/signup';
+import { DashBoard } from './pages/dashboard';
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
           <div>Login</div>
         </Route>
         <Route path="/create-blog/dashboard">
-          <div>Dashboard</div>
+          <DashBoard />
         </Route>
       </Switch>
     </BrowserRouter>

@@ -9,6 +9,7 @@ export const startSignup = (data) => {
     dispatch({ type: SIGNUP });
     try {
       const response = await axios.post("/signup", data);
+      localStorage.setItem("authtoken", response.data.authToken);
       dispatch({ type: SIGNUP_SUCCESS, payload: response.data });
     } catch (error) {
       console.log(error);

@@ -1,24 +1,24 @@
 import { APILoadingStatus } from "../constants";
-import { SIGNUP, SIGNUP_FAILED, SIGNUP_SUCCESS } from "./signup-actions";
+import { CREATE_BLOG, CREATE_BLOG_FAILED, CREATE_BLOG_SUCCESS } from "./blog-actions";
 
-const initialSignupState = {
+const initialCreateBlogState = {
   loadingState: APILoadingStatus.NOT_STARTED,
 };
 
-export const SignupReducer = (
-  state = initialSignupState,
+export const CreateBlogReducer = (
+  state = initialCreateBlogState,
   { type, payload }
 ) => {
   switch (type) {
-    case SIGNUP:
+    case CREATE_BLOG:
       return { ...state, loadingState: APILoadingStatus.STARTED };
-    case SIGNUP_SUCCESS:
+    case CREATE_BLOG_SUCCESS:
       return {
         ...state,
         loadingState: APILoadingStatus.SUCCESS,
         ...payload
       };
-    case SIGNUP_FAILED:
+    case CREATE_BLOG_FAILED:
       return {
         ...state,
         loadingState: APILoadingStatus.FAILED,
