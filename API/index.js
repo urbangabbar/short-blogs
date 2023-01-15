@@ -143,6 +143,21 @@ app.delete("/blogs/:blogID", jsonParser, async (req, res) => {
   return res.status(401).send({ msg: "Unauthorized user" });
 });
 
+app.get("/user-blogs", jsonParser, async (req, res) => {
+  const { authtoken } = req.headers;
+  const user = await validateAuthToken(authtoken);
+  if (user) {
+    let blogs = await Blog.find({ userID: user._id });
+    return res.status(200).send(blogs);
+  }
+  return res.status(401).send({ msg: "Unauthorized user" });
+});
+
+app.get("/blogs", jsonParser, async (req, res) => {
+  let blogs = await Blog.find({});
+  return res.status(200).send(blogs);
+});
+
 async function validateAuthToken(authtoken) {
   if (!authtoken) {
     return; //undefined value
